@@ -12,32 +12,22 @@ function! pytest#get_status() abort
   endif
 endfunction
 
+" Make sure the maker file is loaded
 let s:plugin_path = expand('<sfile>:p:h')
 let s:maker_file = s:plugin_path.'/neomake/makers/ft/python.vim'
 execute "source ". s:maker_file
 
 function! pytest#run_suite(args) abort
 
-  " Make sure the maker file is loaded
+  " Start the airline extension
+  if exists(":AirlineToggle") && exists("g:pytest_airline_enabled") && g:pytest_airline_enabled
+    call airline#extensions#pytest#start()
+  endif
 
-  " THIS WORKS
-  " let g:pytest_xml_file = tempname()
-  " let g:neomake_python_pytest_args = ['--junit-xml='.g:pytest_xml_file, 'tests/test_mai:n.py::test_should_work']
-  " let g:neomake_python_pytest_args = neomake#makers#ft#python#pytest().args + ['tests/test_main.py::test_should_work']
-  call neomake#makers#ft#python#add_args(a:args)
+  call neomake#makers#ft#python#pytest_set_exe('poetry')
+  call neomake#makers#ft#python#pytest_add_args(['run', 'pytest'])
+  call neomake#makers#ft#python#pytest_add_args(a:args)
 
-
-  " function! MyCustomExe(self) abort
-    " let maker = deepcopy(a:self)
-    " echom maker
-    " " call insert(maker.args, maker.exe)
-    " " let maker.exe = 'some_custom_wrapper'
-    " let maker.args = ['--junit-xml='.g:pytest_xml_file, 'tests/test_mai:n.py::test_should_work']
-    " return maker
-  " endfunction
-
-  " echom neomake#config#get('ft.python.pytest.args')
-  " call neomake#config#set('ft.python.pytest.InitForJob', function('MyCustomExe'))
   " EXECUTE WITH THE CURRENT FILE AS TARGET FILE
   " execute 'Neomake pytest'
   " call neomake#Make(1, ['pytest'])
@@ -46,9 +36,44 @@ function! pytest#run_suite(args) abort
   " execute 'Neomake! pytest'
   call neomake#Make(0, ['pytest'])
 
-  " REMEMBER TO RESET THIS IF NEEDED
-  call neomake#makers#ft#python#reset_to_defaults()
-  " unlet g:neomake_python_pytest_args
+  " This function will get called when the maker job ends
+  function! s:JobFinished() abort
+
+    " Get the last test data
+    let l:data =  neomake#makers#ft#python#pytest_get_last_test_data()
+
+    " Update the airline extension
+    if exists(":AirlineToggle") && exists("g:pytest_airline_enabled") && g:pytest_airline_enabled
+        call airline#extensions#pytest#done(l:data)
+    endif
+
+    " Manage the quickfix window
+    if !exists("g:pytest_open_quickfix_on_error") || g:pytest_open_quickfix_on_error
+        if l:data.red > 0
+            " Open the quickfix window if there are errors
+            let l:winnr = winnr()
+            execute "copen"
+            if l:winnr !=# winnr()
+                wincmd p
+            endif
+        else
+            " Close the quickfix window if there are no errors
+            execute "cclose"
+        endif
+    endif
+
+    " Remove the autogroup to disable the hook
+    autocmd! pytest_job_hook
+  endfunction
+
+  " Trigger the hook on NeomakeJobFinished
+  augroup pytest_job_hook
+      au!
+      autocmd User NeomakeJobFinished call s:JobFinished()
+  augroup END
+
+  " REMEMBER TO RESET EVERYTHING HERE
+  call neomake#makers#ft#python#pytest_reset_to_defaults()
   " TODO reset neomake opening quickfix 
 
 endfunction
