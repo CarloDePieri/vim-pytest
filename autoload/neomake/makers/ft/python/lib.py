@@ -1,3 +1,4 @@
+import os
 import re
 from typing import Dict
 import xml.etree.ElementTree as ET
@@ -124,7 +125,7 @@ def parse_pytest_junit_report(path: str) -> Dict:
         "green": 0,
         "skip": 0
     }
-    with open(path, "r") as f:
+    with open(os.path.abspath(path), "r") as f:
         raw = f.read()
         # Fix ascii color escape characters
         raw = raw.replace("", "#x1B")
