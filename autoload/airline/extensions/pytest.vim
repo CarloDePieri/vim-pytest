@@ -156,6 +156,13 @@ function! airline#extensions#pytest#stop()
 endfunction
 
 
+function! airline#extensions#pytest#pytest_clear()
+  let s:status = "clear"
+  call airline#extensions#pytest#apply()
+  AirlineRefresh
+endfunction
+
+
 function! airline#extensions#pytest#init(ext)
   call a:ext.add_statusline_func('airline#extensions#pytest#apply')
 endfunction

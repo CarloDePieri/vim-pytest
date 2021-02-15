@@ -16,6 +16,12 @@ execute "source ". s:maker_file
 
 function! pytest#run_suite(args) abort
 
+  " Disable neomake quickfix open list behavior
+  if len(s:pytest_jobs) == 0
+    let s:neomake_defined_quickfix_behavior = get(b:, 'neomake_open_list', get(g:, 'neomake_open_list', 0))
+  endif
+  let g:neomake_open_list = 0
+
   if s:close_quickfix_on_run
     cclose
   endif
@@ -46,9 +52,7 @@ function! pytest#run_suite(args) abort
   endif
   let s:pytest_jobs += neomake#Make(0, ['pytest'])
 
-  " REMEMBER TO RESET EVERYTHING HERE
   call neomake#makers#ft#python#pytest_reset_to_defaults()
-  " TODO reset neomake opening quickfix 
 
 endfunction
 
@@ -77,6 +81,7 @@ function! s:JobFinished() abort
           endif
       endif
   endif
+
   if l:data.red == 0
     " Close the quickfix window if there are no errors
     execute "cclose"
@@ -85,15 +90,28 @@ function! s:JobFinished() abort
   " Remove the pytest job id from the list
   call s:RemoveJobById(l:jobid)
 
-  " Remove the autogroup to disable the hook
-  autocmd! pytest_job_hook
+  call s:Cleanup()
+endfunction
+
+function! pytest#Clear()
+  " Cancel all running jobs
+  call s:CancelPytestJobs()
+  " Clear the quickfix window and close it
+  cexpr []
+  cclose
+  " Clear the airline extension
+  if s:airline_enabled
+    call airline#extensions#pytest#clear()
+  endif
+  call s:Cleanup()
 endfunction
 
 function! pytest#CancelJobs()
   if s:airline_enabled
-      call airline#extensions#pytest#stop()
+    call airline#extensions#pytest#stop()
   endif
   call s:CancelPytestJobs()
+  call s:Cleanup()
 endfunction
 
 function! s:CancelPytestJobs()
@@ -106,6 +124,15 @@ endfunction
 function! s:RemoveJobById(jobid)
   let l:i = index(s:pytest_jobs, a:jobid)
   call remove(s:pytest_jobs, l:i)
+endfunction
+
+function! s:Cleanup()
+  " Remove the autogroup to disable possibly pending hooks
+  autocmd! pytest_job_hook
+  " Reset neomake quickfix opening behavior
+  if len(s:pytest_jobs) == 0
+    let g:neomake_open_list = s:neomake_defined_quickfix_behavior
+  endif
 endfunction
 
 function! pytest#get_jobs()
