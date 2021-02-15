@@ -6,3 +6,5 @@
 command! -nargs=* -bar Pytest call pytest#run_suite([<f-args>])
 
 command! -bar PytestToggleErrors call pytest#toggle_errors()
+
+command! -bar PytestStop call pytest#CancelJobs()

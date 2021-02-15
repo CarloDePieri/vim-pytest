@@ -105,6 +105,13 @@ function! airline#extensions#pytest#apply(...)
       call insert(l:bar, s:wrap_accent(s:heading, l:separator_color))
     endif
 
+  elseif s:status == "stopped"
+    " This should be called when cancelling jobs
+    if len(s:heading) > 0
+      call add(l:bar, s:wrap_accent(s:heading, "bold_gray"))
+    endif
+    call add(l:bar, s:wrap_accent("stopped", "bold_gray"))
+
   endif
 
   " Insert spaces between components
@@ -143,7 +150,7 @@ endfunction
 
 
 function! airline#extensions#pytest#stop()
-  let s:status = "done"
+  let s:status = "stopped"
   call airline#extensions#pytest#apply()
   AirlineRefresh
 endfunction
