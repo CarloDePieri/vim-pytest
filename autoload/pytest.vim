@@ -97,6 +97,13 @@ function! s:JobFinished() abort
 endfunction
 
 function! pytest#OpenRawOutput()
+  " Close the quickfix window if open
+  cclose
+
+  " wait for the quickfix window to close
+  sleep 100m
+  redraw
+
   let l:data = neomake#makers#ft#python#pytest_get_last_test_data()
   if len(l:data.raw) > 0
     " Open a new window below
