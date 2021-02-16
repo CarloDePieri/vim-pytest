@@ -19,11 +19,12 @@ if !exists('s:additional_args')
     let s:additional_args = []
 endif
 if !exists('s:last_test_data')
-    let s:last_test_data = {'red': 0, 'green': 0, 'skip': 0}
+    let s:last_test_data = {'red': 0, 'green': 0, 'skip': 0, 'raw': ''}
 endif
 
 function! neomake#makers#ft#python#ProcessPytestResults(context) abort
     let s:last_test_data = py3eval("parse_pytest_junit_report(vim.eval('s:report_file'))")
+    let s:last_test_data.raw = a:context.output
     return s:last_test_data.entries
 endfunction
 
@@ -79,5 +80,4 @@ endfunction
 
 function! neomake#makers#ft#python#pytest_get_last_test_data()
     return s:last_test_data
-    return get(s:, 'last_test_data', {'red': 0, 'green': 0, 'skip': 0})
 endfunction

@@ -6,8 +6,9 @@ let s:airline_enabled = exists(":AirlineToggle") && exists("g:pytest_airline_ena
 let s:single_job_mode = !exists("g:pytest_single_job_mode") || g:pytest_single_job_mode
 let s:open_quickfix_on_error = !exists("g:pytest_open_quickfix_on_error") || g:pytest_open_quickfix_on_error
 
-" Init the job id to 0
+" Init the jobid list
 let s:pytest_jobs = []
+let s:last_pytest_job = 0
 
 " Make sure the maker file is loaded by vim
 let s:plugin_path = expand('<sfile>:p:h')
@@ -90,8 +91,31 @@ function! s:JobFinished() abort
   " Remove the pytest job id from the list
   call s:RemoveJobById(l:jobid)
 
+  let s:last_pytest_job = l:jobid
+
   call s:Cleanup()
 endfunction
+
+function! pytest#OpenRawOutput()
+  let l:data = neomake#makers#ft#python#pytest_get_last_test_data()
+  if len(l:data.raw) > 0
+    bel split
+    let l:t = tempname()
+    call writefile(l:data.raw, l:t)
+    execute("term cat " . l:t)
+    setlocal nomod
+    setlocal nohidden
+    setlocal bufhidden=
+    setlocal buflisted
+    execute("file pytest_" . s:last_pytest_job)
+    nmap <buffer> q :q<cr>
+    if exists(":AirlineToggle") 
+      AirlineRefresh
+    endif
+  else
+    echo "> No raw test output found. Run a test first!"
+  endif
+ endfunction
 
 function! pytest#Clear()
   " Cancel all running jobs

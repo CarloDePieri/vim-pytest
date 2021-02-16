@@ -10,3 +10,5 @@ command! -bar PytestToggleErrors call pytest#toggle_errors()
 command! -bar PytestStop call pytest#CancelJobs()
 
 command! -bar PytestClear call pytest#Clear()
+
+command! -bar PytestOutput call pytest#OpenRawOutput()
