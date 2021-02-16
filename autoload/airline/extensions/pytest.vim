@@ -20,7 +20,7 @@ function! s:wrap_accent(text, accent_name)
 endfunction
 
 " Set starting status
-let s:status = "stopped"
+let s:status = "clear"
 " Set a default here for tests data
 let s:test_data = {'red': 0, 'green': 0, 'skip': 0}
 
