@@ -99,16 +99,38 @@ endfunction
 function! pytest#OpenRawOutput()
   let l:data = neomake#makers#ft#python#pytest_get_last_test_data()
   if len(l:data.raw) > 0
-    bel split
+    " Open a new window below
+    bel new
+
+    " Write the raw pytest output to a file
     let l:t = tempname()
     call writefile(l:data.raw, l:t)
-    execute("term cat " . l:t)
+
+    " Then make it read it to the term: this way we get colors!
+    " A shell session must be started after cat, or the output will be
+    " truncated for some reason
+    call termopen('cat '.l:t." && bash")
+
+    " wait a bit for the terminal to open
+    sleep 100m
+    redraw
+
+    " Remove the shell prompt
+    setlocal modifiable
+    call execute("normal! Gddgg")
+    setlocal nomodifiable
+
+    " Make the split window a little more permanent
     setlocal nomod
     setlocal nohidden
     setlocal bufhidden=
     setlocal buflisted
     execute("file pytest_" . s:last_pytest_job)
+
+    " Map a quick way out
     nmap <buffer> q :q<cr>
+
+    " Update the airline bar
     if exists(":AirlineToggle") 
       AirlineRefresh
     endif
