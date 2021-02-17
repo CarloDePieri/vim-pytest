@@ -125,18 +125,31 @@ def parse_pytest_junit_report(path: str) -> Dict:
         "green": 0,
         "skip": 0
     }
-    with open(os.path.abspath(path), "r") as f:
-        raw = f.read()
-        # Fix ascii color escape characters
-        raw = raw.replace("", "#x1B")
-    # Parse the xml report
-    tree = ET.fromstring(raw)
+    try:
+        with open(os.path.abspath(path), "r") as f:
+            raw = f.read()
+            # Fix ascii color escape characters
+            raw = raw.replace("", "#x1B")
+        # Parse the xml report
+        tree = ET.fromstring(raw)
 
-    for testsuite in tree.findall('testsuite'):
-        suitedata = _parse_testsuite(testsuite)
-        data["red"] += suitedata["red"]
-        data["green"] += suitedata["green"]
-        data["skip"] += suitedata["skip"]
-        data["entries"] += suitedata["entries"]
+        for testsuite in tree.findall('testsuite'):
+            suitedata = _parse_testsuite(testsuite)
+            data["red"] += suitedata["red"]
+            data["green"] += suitedata["green"]
+            data["skip"] += suitedata["skip"]
+            data["entries"] += suitedata["entries"]
+    except Exception:
+        data["entries"].append(
+            {
+                "text": "Execution error. Check :PytestOutput",
+                "type": "E",
+                "lnum": 1,
+                "col": 0,
+                "length": 1,
+                "filename": ""
+            }
+        )
+        data["red"] = 1
 
     return data
