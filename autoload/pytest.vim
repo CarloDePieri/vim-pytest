@@ -22,6 +22,7 @@ execute "source ". s:maker_file
 if s:vim_test_installed
 
   function! pytest#vimtest_custom_strategy(cmd)
+    echom "Running: " . a:cmd
     let l:exe = split(a:cmd)[0]
     let l:args = split(a:cmd)[1:]
     call pytest#run(l:exe, l:args)
@@ -31,6 +32,8 @@ if s:vim_test_installed
   let g:test#custom_strategies = {'pytest_custom': function('pytest#vimtest_custom_strategy')}
 
   function! pytest#vimtestwrapper(target, args) abort
+
+    let l:pytest_test_pattern = '\v(test_[^/]+|[^/]+_test)\.py$'
 
     let l:already_defined = {}
     let l:to_be_saved = [
@@ -46,16 +49,35 @@ if s:vim_test_installed
       endif
     endfor
 
+    " Special kludge for not loosing vim-test file_pattern variable
+    " since it gets autoloaded later
+    if !has_key(l:already_defined, "g:test#python#pytest#file_pattern")
+      execute "let l:already_defined['g:test#python#pytest#file_pattern'] = '" . l:pytest_test_pattern . "'"
+    endif
+
     let g:test#strategy = 'pytest_custom'
     let g:test#python#runner = 'pytest'
 
-    if exists("g:pytest_file_pattern")
-      let g:test#python#pytest#file_pattern = g:pytest_file_pattern
-    endif
+    if index(['file', 'nearest'], a:target) >= 0
 
-    if index(['suite', 'file', 'nearest'], a:target) >= 0
+      " Forget the last position, just in case we launched from a file
+      " the vim-test runner does not recognize
+      if exists('g:test#last_position')
+        unlet g:test#last_position
+      endif
+
       call test#run(a:target, a:args)
-    elseif a:target == "last"
+
+    elseif a:target == 'suite'
+
+      " Allow for louser file_patter when launching the whole suite
+      if exists("g:pytest_file_pattern")
+        let g:test#python#pytest#file_pattern = g:pytest_file_pattern
+      endif
+
+      call test#run(a:target, a:args)
+
+    elseif a:target == 'last'
       let l:last = split(get(g:, 'test#last_command', ""))
       let l:args = a:args
 
