@@ -15,7 +15,7 @@ let s:last_pytest_job = 0
 
 " Make sure the maker file is loaded by vim
 let s:plugin_path = expand('<sfile>:p:h')
-let s:maker_file = s:plugin_path.'/neomake/makers/ft/python.vim'
+let s:maker_file = s:plugin_path.'/neomake/makers/pytest.vim'
 execute "source ". s:maker_file
 
 " If vim-test is installed, use it
@@ -87,8 +87,8 @@ function! pytest#run(exe, args) abort
     call airline#extensions#pytest#start()
   endif
 
-  call neomake#makers#ft#python#pytest_set_exe(a:exe)
-  call neomake#makers#ft#python#pytest_add_args(a:args)
+  call neomake#makers#pytest#set_exe(a:exe)
+  call neomake#makers#pytest#add_args(a:args)
 
   " Trigger the hook on NeomakeJobFinished
   augroup pytest_job_hook
@@ -102,7 +102,7 @@ function! pytest#run(exe, args) abort
   endif
   let s:pytest_jobs += neomake#Make(0, ['pytest'])
 
-  call neomake#makers#ft#python#pytest_reset_to_defaults()
+  call neomake#makers#pytest#reset_to_defaults()
 
 endfunction
 
@@ -113,7 +113,7 @@ function! s:JobFinished() abort
   let l:jobid = l:context.jobinfo.id
 
   " Get the last test data
-  let l:data =  neomake#makers#ft#python#pytest_get_last_test_data()
+  let l:data =  neomake#makers#pytest#get_last_test_data()
 
   " Update the airline extension
   if s:airline_enabled
@@ -153,7 +153,7 @@ function! pytest#OpenRawOutput()
   sleep 100m
   redraw
 
-  let l:data = neomake#makers#ft#python#pytest_get_last_test_data()
+  let l:data = neomake#makers#pytest#get_last_test_data()
   if len(l:data.raw) > 0
     " Open a new window below
     bel new
