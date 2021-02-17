@@ -4,10 +4,10 @@ let s:airline_installed = &rtp =~ 'vim-airline' && exists(":AirlineToggle")
 let s:vim_test_installed = &rtp =~ 'vim-test' && exists(":TestSuite")
 
 " Recover user preferences
-let s:close_quickfix_on_run = !exists("g:pytest_close_quickfix_on_run") || g:pytest_close_quickfix_on_run
 let s:airline_enabled = s:airline_installed && exists("g:pytest_airline_enabled") && g:pytest_airline_enabled
 let s:single_job_mode = !exists("g:pytest_single_job_mode") || g:pytest_single_job_mode
 let s:open_quickfix_on_error = !exists("g:pytest_open_quickfix_on_error") || g:pytest_open_quickfix_on_error
+let s:close_quickfix_on_run = !exists("g:pytest_close_quickfix_on_run") || g:pytest_close_quickfix_on_run
 
 " Init the jobid list
 let s:pytest_jobs = []
@@ -123,13 +123,13 @@ function! s:JobFinished() abort
   " Manage the quickfix window
   if s:open_quickfix_on_error
     if l:data.red > 0
-          " Open the quickfix window if there are errors
-          let l:winnr = winnr()
-          execute "copen"
-          if l:winnr !=# winnr()
-              wincmd p
-          endif
+      " Open the quickfix window if there are errors
+      let l:winnr = winnr()
+      execute "copen"
+      if l:winnr !=# winnr()
+        execute "wincmd p"
       endif
+    endif
   endif
 
   if l:data.red == 0
