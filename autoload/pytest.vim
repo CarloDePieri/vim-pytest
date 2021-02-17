@@ -31,12 +31,27 @@ if s:vim_test_installed
   let g:test#custom_strategies = {'pytest_custom': function('pytest#vimtest_custom_strategy')}
 
   function! pytest#vimtestwrapper(target, args) abort
-    " Save already defined strategy and python runner
-    let l:already_defined_strategy = get(g:, 'test#strategy', "")
-    let l:already_defined_runner = get(g:, 'test#python#runner', "")
+
+    let l:already_defined = {}
+    let l:to_be_saved = [
+      \ 'g:test#python#pytest#file_pattern',
+      \ 'g:test#strategy',
+      \ 'g:test#python#runner',
+      \ ]
+
+    " Save already defined variables
+    for name in l:to_be_saved
+      if exists(name)
+        execute "let l:already_defined['" . name . "'] = " . name
+      endif
+    endfor
 
     let g:test#strategy = 'pytest_custom'
     let g:test#python#runner = 'pytest'
+
+    if exists("g:pytest_file_pattern")
+      let g:test#python#pytest#file_pattern = g:pytest_file_pattern
+    endif
 
     if index(['suite', 'file', 'nearest'], a:target) >= 0
       call test#run(a:target, a:args)
@@ -54,18 +69,16 @@ if s:vim_test_installed
       echom a:target . ' is not a valid target. Use one of ["suite", "file", "nearest", "last"]'
     endif
 
-    " Restore already defined strategy..
-    if len(l:already_defined_strategy) > 0
-      let g:test#strategy = l:already_defined_strategy
-    else
-      unlet g:test#strategy
-    endif
-    " .. and runner
-    if len(l:already_defined_runner) > 0
-      let g:test#python#runner = l:already_defined_runner
-    else
-      unlet g:test#python#runner
-    endif
+    " Restore all values we modified to their previous values
+    for name in l:to_be_saved
+      if has_key(l:already_defined, name)
+        let l:value = get(l:already_defined, name)
+        execute "let " . l:name . " = " . string(l:value)
+      else
+        execute "unlet " . l:name
+      endif
+    endfor
+
   endfunction
 
 endif
