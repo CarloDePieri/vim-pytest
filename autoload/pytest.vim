@@ -1,8 +1,11 @@
 scriptencoding utf-8
 
+let s:airline_installed = &rtp =~ 'vim-airline' && exists(":AirlineToggle")
+let s:vim_test_installed = &rtp =~ 'vim-test' && exists(":TestSuite")
+
 " Recover user preferences
 let s:close_quickfix_on_run = !exists("g:pytest_close_quickfix_on_run") || g:pytest_close_quickfix_on_run
-let s:airline_enabled = exists(":AirlineToggle") && exists("g:pytest_airline_enabled") && g:pytest_airline_enabled
+let s:airline_enabled = s:airline_installed && exists("g:pytest_airline_enabled") && g:pytest_airline_enabled
 let s:single_job_mode = !exists("g:pytest_single_job_mode") || g:pytest_single_job_mode
 let s:open_quickfix_on_error = !exists("g:pytest_open_quickfix_on_error") || g:pytest_open_quickfix_on_error
 
@@ -15,7 +18,59 @@ let s:plugin_path = expand('<sfile>:p:h')
 let s:maker_file = s:plugin_path.'/neomake/makers/ft/python.vim'
 execute "source ". s:maker_file
 
-function! pytest#run_suite(args) abort
+" If vim-test is installed, use it
+if s:vim_test_installed
+
+  function! pytest#vimtest_custom_strategy(cmd)
+    let l:exe = split(a:cmd)[0]
+    let l:args = split(a:cmd)[1:]
+    call pytest#run(l:exe, l:args)
+  endfunction
+
+  " Add to vim-test our custom strategy
+  let g:test#custom_strategies = {'pytest_custom': function('pytest#vimtest_custom_strategy')}
+
+  function! pytest#vimtestwrapper(target, args) abort
+    " Save already defined strategy and python runner
+    let l:already_defined_strategy = get(g:, 'test#strategy', "")
+    let l:already_defined_runner = get(g:, 'test#python#runner', "")
+
+    let g:test#strategy = 'pytest_custom'
+    let g:test#python#runner = 'pytest'
+
+    if index(['suite', 'file', 'nearest'], a:target) >= 0
+      call test#run(a:target, a:args)
+    elseif a:target == "last"
+      let l:last = split(get(g:, 'test#last_command', ""))
+      let l:args = a:args
+
+      " Avoid the repeating of --lf tag with subsequent calls
+      if index(a:args, '--lf') >= 0 && index(l:last, '--lf') >= 0
+        let l:args = filter(a:args, 'v:val != "--lf"')
+      endif
+
+      call test#run_last(l:args)
+    else
+      echom a:target . ' is not a valid target. Use one of ["suite", "file", "nearest", "last"]'
+    endif
+
+    " Restore already defined strategy..
+    if len(l:already_defined_strategy) > 0
+      let g:test#strategy = l:already_defined_strategy
+    else
+      unlet g:test#strategy
+    endif
+    " .. and runner
+    if len(l:already_defined_runner) > 0
+      let g:test#python#runner = l:already_defined_runner
+    else
+      unlet g:test#python#runner
+    endif
+  endfunction
+
+endif
+
+function! pytest#run(exe, args) abort
 
   " Disable neomake quickfix open list behavior
   if len(s:pytest_jobs) == 0
@@ -32,13 +87,8 @@ function! pytest#run_suite(args) abort
     call airline#extensions#pytest#start()
   endif
 
-  call neomake#makers#ft#python#pytest_set_exe('poetry')
-  call neomake#makers#ft#python#pytest_add_args(['run', 'pytest'])
+  call neomake#makers#ft#python#pytest_set_exe(a:exe)
   call neomake#makers#ft#python#pytest_add_args(a:args)
-
-  " EXECUTE WITH THE CURRENT FILE AS TARGET FILE
-  " execute 'Neomake pytest'
-  " call neomake#Make(1, ['pytest'])
 
   " Trigger the hook on NeomakeJobFinished
   augroup pytest_job_hook
@@ -46,9 +96,8 @@ function! pytest#run_suite(args) abort
       autocmd User NeomakeJobFinished call s:JobFinished()
   augroup END
 
-  " EXECUTE WITHOUT TARGET FILE
-  " execute 'Neomake! pytest'
   if s:single_job_mode
+    " Stop previous jobs
     call s:CancelPytestJobs()
   endif
   let s:pytest_jobs += neomake#Make(0, ['pytest'])
