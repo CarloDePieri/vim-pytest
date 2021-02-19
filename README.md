@@ -1,10 +1,18 @@
-My current setup for python TDD with pytest from vim. It features:
+My current setup for python TDD with [pytest](https://docs.pytest.org/en/latest/)
+from vim.
 
-- a custom neomake runner that will run pytest **asynchronously**, parse
-the results and fill the quickfix window with **jumpable** failed tests (A). Failing
-lines will be highlighted in the gutter (B) and the exception will be printed \(C\).
-- a dedicated airline extension (D), that will reflect tests status and results
-- smart test selection and venv recognition, powered by vim-test
+Its features:
+
+- a custom [neomake](https://github.com/neomake/neomake) runner that will run
+pytest **asynchronously**, parse the results and fill the quickfix window with
+**jumpable** failed tests `A`. Failing lines will be highlighted in the gutter `B`
+and the exception will be printed `C`
+- a dedicated [airline](https://github.com/vim-airline/vim-airline) extension `D`,
+that will reflect tests status and results
+- smart test selection and venv recognition, powered by [vim-test](https://github.com/vim-test/vim-test/)
+- since it does not depends on pytest stdout, it's compatible with plugins
+like [pytest-sugar](https://pypi.org/project/pytest-sugar/) or
+[pytest-spec](https://pypi.org/project/pytest-spec/)
 
 <img src="https://user-images.githubusercontent.com/5459291/108346515-c0ba1b80-71df-11eb-9757-02dc9811a045.png" width="400">
 
@@ -95,6 +103,11 @@ nnoremap <leader>tx     :w\|PytestLastFailed<CR>
 nnoremap <leader>tt     :w\|PytestToggleError<CR>
 " open <T>est <O>utput
 nnoremap <leader>to     :w\|PytestOutput<CR>
+
+" Mappings useful for navigating the quickfix windowa (even with only one
+" entry)
+nnoremap ]q :<C-R>=len(getqflist())==1?"cc":"cn"<CR><CR>
+nnoremap [q :<C-R>=len(getqflist())==1?"cc":"cp"<CR><CR>
 ```
 
 ### Available settings
