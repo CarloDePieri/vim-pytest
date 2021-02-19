@@ -1,4 +1,3 @@
-
 if &rtp =~ 'vim-test' && exists(":TestSuite")
   " If vim-test is installed, use it
   command! -nargs=* -bar Pytest call pytest#vimtestwrapper('suite', split(<q-args>))
@@ -7,8 +6,9 @@ if &rtp =~ 'vim-test' && exists(":TestSuite")
   command! -nargs=* -bar PytestLast call pytest#vimtestwrapper("last", split(<q-args>))
   command! -nargs=* -bar PytestLastFailed call pytest#vimtestwrapper("last", ['--lf'] + split(<q-args>))
 
-  " Define the file-pattern to be used by vim-test
-  let g:pytest_file_pattern = '\v(.*)\.(py)$'
+  " Define the file-pattern to be used by vim-test when launching the whole
+  " test suite
+  let g:pytest_file_pattern = '\v(.*)\.(.*)$'
 else
   " Fallback to simpler command
   command! -nargs=* -bar Pytest call pytest#run('pytest', split(<q-args>))
