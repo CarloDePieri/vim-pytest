@@ -4,7 +4,7 @@ let s:airline_installed = &rtp =~ 'vim-airline' && exists(":AirlineToggle")
 let s:vim_test_installed = &rtp =~ 'vim-test' && exists(":TestSuite")
 
 " Recover user preferences
-let s:airline_enabled = s:airline_installed && exists("g:pytest_airline_enabled") && g:pytest_airline_enabled
+let s:airline_enabled = s:airline_installed && (!exists("g:pytest_airline_enabled") || g:pytest_airline_enabled)
 let s:single_job_mode = !exists("g:pytest_single_job_mode") || g:pytest_single_job_mode
 let s:open_quickfix_on_error = !exists("g:pytest_open_quickfix_on_error") || g:pytest_open_quickfix_on_error
 let s:close_quickfix_on_run = !exists("g:pytest_close_quickfix_on_run") || g:pytest_close_quickfix_on_run

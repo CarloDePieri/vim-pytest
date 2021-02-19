@@ -1,4 +1,4 @@
-if !(exists(":AirlineToggle") && exists("g:pytest_airline_enabled") && g:pytest_airline_enabled)
+if !(exists(":AirlineToggle") && (!exists("g:pytest_airline_enabled") || g:pytest_airline_enabled))
   finish
 endif
 
@@ -36,17 +36,17 @@ else
 endif
 
 " Define the separator symbol
-let s:pytest_default_left_separator_symbol = ""
-let s:pytest_default_right_separator_symbol = ""
-if !exists('g:pytest_separator_symbol')
-  let s:left_sections = ['a', 'b', 'b']
+let s:pytest_default_left_separator_icon = ""
+let s:pytest_default_right_separator_icon = ""
+let s:left_sections = ['a', 'b']
+if !exists('g:pytest_airline_separator_icon')
   if index(s:left_sections, s:airline_section) >= 0
-    let s:separator_symbol = s:pytest_default_left_separator_symbol
+    let s:separator_icon = s:pytest_default_left_separator_icon
   else
-    let s:separator_symbol = s:pytest_default_right_separator_symbol
+    let s:separator_icon = s:pytest_default_right_separator_icon
   endif
 else
-    let s:separator_symbol = g:pytest_separator_symbol
+    let s:separator_icon = g:pytest_airline_separator_icon
 endif
 
 " Define the icon
@@ -58,8 +58,8 @@ endif
 
 " Create the heading
 let s:heading = ""
-if s:separator_symbol != ""
-  let s:heading = s:separator_symbol
+if s:separator_icon != ""
+  let s:heading = s:separator_icon
 endif
 if s:icon != ""
   if len(s:heading) > 0
