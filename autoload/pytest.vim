@@ -236,6 +236,8 @@ function! pytest#Clear()
   " Clear the quickfix window and close it
   cexpr []
   cclose
+  " Clear all Neomake signs
+  NeomakeClean!
   " Clear the airline extension
   if s:airline_enabled
     call airline#extensions#pytest#clear()
