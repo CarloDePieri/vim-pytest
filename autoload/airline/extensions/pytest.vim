@@ -156,7 +156,7 @@ function! airline#extensions#pytest#stop()
 endfunction
 
 
-function! airline#extensions#pytest#pytest_clear()
+function! airline#extensions#pytest#clear()
   let s:status = "clear"
   call airline#extensions#pytest#apply()
   AirlineRefresh
