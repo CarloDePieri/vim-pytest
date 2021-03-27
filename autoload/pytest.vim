@@ -266,10 +266,12 @@ function! s:RemoveJobById(jobid)
 endfunction
 
 function! s:Cleanup()
-  " Remove the autogroup to disable possibly pending hooks
-  autocmd! pytest_job_hook
+  " Remove the autogroup autocmd to disable possibly pending hooks
+  aug pytest_job_hook
+    au!
+  aug END
   " Reset neomake quickfix opening behavior
-  if len(s:pytest_jobs) == 0
+  if len(s:pytest_jobs) == 0 && exists("s:neomake_defined_quickfix_behavior")
     let g:neomake_open_list = s:neomake_defined_quickfix_behavior
   endif
 endfunction
