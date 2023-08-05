@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="0.028" timestamp="2023-08-05T18:15:22.874463" hostname="flyingcik"><testcase classname="tests.xmls.test_fail_out" name="test_fail" time="0.001"><failure message="Exception">def test_fail():
+&gt;       assert outside()
+
+#x1B[1m#x1B[31mtest_fail_out.py#x1B[0m:6: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def outside():
+&gt;       raise Exception()
+#x1B[1m#x1B[31mE       Exception#x1B[0m
+
+#x1B[1m#x1B[31mtest_fail_out.py#x1B[0m:2: Exception</failure></testcase></testsuite></testsuites>
