@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "tests"
+version = "0.1.0"
+description = ""
+authors = ["Carlo De Pieri <depieri.carlo@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.0"
+black = "^23.7.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
