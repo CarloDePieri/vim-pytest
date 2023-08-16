@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="1" failures="0" skipped="0" tests="1" time="0.019" timestamp="2023-08-08T19:18:41.162915" hostname="propcik"><testcase classname="tests.xmls.test_error_in" name="test_error" time="0.000"><error message="failed on setup with &quot;RuntimeError&quot;">@pytest.fixture
+    def my_fixture():
+&gt;       raise RuntimeError()
+E       RuntimeError
+
+test_error_in.py:6: RuntimeError</error></testcase></testsuite></testsuites>
