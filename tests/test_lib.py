@@ -43,11 +43,24 @@ class TestAJunitReporParser:
         assert failed["type"] == "FailedTest"
         assert origin["type"] == ">"
 
-    @pytest.mark.parametrize("test_file", ["error_color.xml", "error_nocolor.xml"])
+    @pytest.mark.parametrize(
+        "test_file", ["error_in_color.xml", "error_in_nocolor.xml"]
+    )
     def test_should_handle_errors(self, test_file):
         """... it should handle errors"""
         data = parse_pytest_junit_report(str(xml_folder / test_file))
         assert data["red"] == 1
+        entry = data["entries"][0]
+        assert entry["type"] == "BrokenTest"
+
+    @pytest.mark.parametrize(
+        "test_file", ["error_out_color.xml", "error_out_nocolor.xml"]
+    )
+    def test_should_handle_errors_with_layered_stacktrace(self, test_file):
+        """... it should handle errors with layered stacktrace"""
+        data = parse_pytest_junit_report(str(xml_folder / test_file))
+        assert data["red"] == 1
+        assert len(data["entries"]) == 2
         entry = data["entries"][0]
         assert entry["type"] == "BrokenTest"
 

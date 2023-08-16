@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="0.027" timestamp="2023-08-05T18:15:21.679358" hostname="flyingcik"><testcase classname="tests.xmls.test_fail_in" name="test_fail" time="0.001"><failure message="assert False">def test_fail():
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="0.016" timestamp="2023-08-08T19:18:39.326677" hostname="propcik"><testcase classname="tests.xmls.test_fail_in" name="test_fail" time="0.000"><failure message="assert False">def test_fail():
 &gt;       assert False
 #x1B[1m#x1B[31mE       assert False#x1B[0m
 
