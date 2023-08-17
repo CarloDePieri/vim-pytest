@@ -1,9 +1,8 @@
 [![Maintenance](https://img.shields.io/maintenance/yes/2023)](https://github.com/CarloDePieri/pymailtm/)
 
-My current setup for python TDD with [pytest](https://docs.pytest.org/en/latest/)
-from vim.
+A neovim plugin for [pytest](https://docs.pytest.org/en/latest/).
 
-Its features:
+In combination with other plugins, it offers an IDE-like experience. Its features:
 
 - a custom [neomake](https://github.com/neomake/neomake) runner that will run
 pytest **asynchronously**, parse the results and fill the quickfix window with
@@ -14,8 +13,6 @@ that will reflect tests status and results
 - smart test selection and venv recognition, powered by [vim-test](https://github.com/vim-test/vim-test/)
 - since it does not depends on pytest stdout, it's compatible with plugins that modify
 it. Plugins that modify the junit output could still pose a problem.
-
-[pytest-spec](https://pypi.org/project/pytest-spec/)
 
 <img src="https://user-images.githubusercontent.com/5459291/108346515-c0ba1b80-71df-11eb-9757-02dc9811a045.png" width="400">
 
@@ -33,11 +30,12 @@ the smart test selection and the venv awareness.
 This is an example using [vim-plug](https://github.com/junegunn/vim-plug):
 
 ```vim
-" Needed 
+" Dependencies: Needed 
 Plug 'neomake/neomake'
-" Optionals
+" Dependencies: Optionals
 Plug 'vim-airline/vim-airline'
 Plug 'vim-test/vim-test'
+
 " The actual plugin
 Plug 'CarloDePieri/vim-pytest'
 ```
@@ -88,8 +86,8 @@ These commands are always available.
 
 ### Mappings
 
-This plugin does not come with custom mappings, but here are my personal ones with
-the relative mnemonics.
+This plugin does not come with predefined mappings, but here are my personal ones,
+with the relative mnemonics.
 
 ```vim
 " launch <T>est <S>uite
