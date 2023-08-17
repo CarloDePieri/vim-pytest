@@ -1,3 +1,5 @@
+[![Maintenance](https://img.shields.io/maintenance/yes/2023)](https://github.com/CarloDePieri/pymailtm/)
+
 My current setup for python TDD with [pytest](https://docs.pytest.org/en/latest/)
 from vim.
 
@@ -10,8 +12,9 @@ and the exception will be printed `C`
 - a dedicated [airline](https://github.com/vim-airline/vim-airline) extension `D`,
 that will reflect tests status and results
 - smart test selection and venv recognition, powered by [vim-test](https://github.com/vim-test/vim-test/)
-- since it does not depends on pytest stdout, it's compatible with plugins
-like [pytest-sugar](https://pypi.org/project/pytest-sugar/) or
+- since it does not depends on pytest stdout, it's compatible with plugins that modify
+it. Plugins that modify the junit output could still pose a problem.
+
 [pytest-spec](https://pypi.org/project/pytest-spec/)
 
 <img src="https://user-images.githubusercontent.com/5459291/108346515-c0ba1b80-71df-11eb-9757-02dc9811a045.png" width="400">
@@ -29,7 +32,7 @@ the smart test selection and the venv awareness.
 
 This is an example using [vim-plug](https://github.com/junegunn/vim-plug):
 
-```
+```vim
 " Needed 
 Plug 'neomake/neomake'
 " Optionals
@@ -43,7 +46,7 @@ The neomake runner relies on a modern junit output file; this means that either
 a recent version of pytest must be used (`>=6`) or, if using previous versions, the
 `junit_family` must be set to `xunit2`, like this:
 
-```
+```ini
 # pytest.ini
 [pytest]
 junit_family=xunit2
@@ -88,7 +91,7 @@ These commands are always available.
 This plugin does not come with custom mappings, but here are my personal ones with
 the relative mnemonics.
 
-```
+```vim
 " launch <T>est <S>uite
 nnoremap <leader>ts     :w\|Pytest<CR>
 " launch <T>est <F>ile
@@ -104,7 +107,7 @@ nnoremap <leader>tt     :w\|PytestToggleError<CR>
 " open <T>est <O>utput
 nnoremap <leader>to     :w\|PytestOutput<CR>
 
-" Mappings useful for navigating the quickfix windowa (even with only one
+" Mappings useful for navigating the quickfix window (even with only one
 " entry)
 nnoremap ]q :<C-R>=len(getqflist())==1?"cc":"cn"<CR><CR>
 nnoremap [q :<C-R>=len(getqflist())==1?"cc":"cp"<CR><CR>
@@ -120,5 +123,5 @@ nnoremap [q :<C-R>=len(getqflist())==1?"cc":"cp"<CR><CR>
 | `g:pytest_xml_file` | random temporary file | The path of the xml file passed to pytest's `--junit-xml=`. |
 | `g:pytest_airline_enabled` | `1` | Show the airline status bar. |
 | `g:pytest_airline_section` | `b` | The airline section the pytest status bar will be appended to.<br/>Good candidates are `b` or `y`. |
-| `g:pytest_airline_separator_icon` | `` \ `` | The symbol used as separator in the airline bar. |
-| `g:pytest_airline_icon` | `` | The symbol used as icon, right after the separator in the airline bar. |
+| `g:pytest_airline_separator_icons` | [``, ``] | The symbols used as separator in the airline bar. |
+| `g:pytest_airline_icon` | `` | The symbol(s) used as icon, right after the separator in the airline bar. |
